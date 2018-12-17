@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package proto;
+
+service QrCode {
+	rpc CheckAuth (TokenRequest) returns (TokenResponse) {}
+	rpc GetToken (TokenRequest) returns (TokenResponse) {}
+	rpc AccessToken (TokenRequest) returns (TokenResponse) {}
+	rpc RefreshToken (TokenRequest) returns (TokenResponse) {}
+}
+
+
+message AuthRequest {
+	 string 	AppID = 1;
+	 string 	AppSecret = 2;
+	 string    GrantType = 3
+}
+
+message AuthRequest {
+	 string 	AppID = 1;
+	 string 	AppSecret = 2;
+	 string    GrantType = 3
+}
+
+
+message TokenRequest {
+	 string 	AppID = 1;
+	 string 	AppSecret = 2;
+	 string    GrantType = 3
+}
+
+
+message TokenResponse {
+	string AccessToken = 1;
+	string ExpiresIn = 2
+}
