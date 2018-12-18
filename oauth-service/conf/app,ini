@@ -1,0 +1,14 @@
+[server]
+#debug or release
+RunMode = debug
+HttpPort = 8000
+ReadTimeout = 60
+WriteTimeout = 60
+
+[database]
+Type = mysql
+User = root
+Password = 123
+Host = 127.0.0.1:3306
+Name = oauth
+#TablePrefix = blog_

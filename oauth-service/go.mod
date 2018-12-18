@@ -10,6 +10,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.0
 	github.com/golang/oauth2 v0.0.0-20181203162652-d668ce993890
 	github.com/jinzhu/gorm v1.9.1
+	github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a // indirect
 	github.com/tidwall/btree v0.0.0-20170113224114-9876f1454cf0 // indirect
 	github.com/tidwall/buntdb v1.0.0 // indirect
 	github.com/tidwall/gjson v1.1.3 // indirect
