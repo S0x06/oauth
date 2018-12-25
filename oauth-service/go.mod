@@ -7,6 +7,7 @@ require (
 	github.com/go-kit/kit v0.8.0
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/go-playground/validator v9.24.0+incompatible
+	github.com/go-redis/redis v6.14.2+incompatible
 	github.com/go-sql-driver/mysql v1.4.0
 	github.com/golang/oauth2 v0.0.0-20181203162652-d668ce993890
 	github.com/jinzhu/gorm v1.9.1
@@ -20,6 +21,7 @@ require (
 	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
 	gopkg.in/gin-gonic/gin.v1 v1.3.0
 	gopkg.in/oauth2.v3 v3.9.2
+//github.com/smartystreets/goconvey v1.6.0
 
 )
 
