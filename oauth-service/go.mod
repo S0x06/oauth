@@ -2,7 +2,7 @@ module github.com/oauth/v2
 
 require (
 	github.com/boombuler/barcode v1.0.0
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-ini/ini v1.39.0
 	github.com/go-kit/kit v0.8.0
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
@@ -20,8 +20,7 @@ require (
 	github.com/tidwall/rtree v0.0.0-20180113144539-6cd427091e0e // indirect
 	github.com/tidwall/tinyqueue v0.0.0-20180302190814-1e39f5511563 // indirect
 	gopkg.in/gin-gonic/gin.v1 v1.3.0
-	gopkg.in/oauth2.v3 v3.9.2
-//github.com/smartystreets/goconvey v1.6.0
+//github.com/smartystreets/goconvey v1.6.3
 
 )
 

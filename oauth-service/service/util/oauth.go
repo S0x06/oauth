@@ -1,41 +1,40 @@
 package util
 
 import (
+	"encoding/json"
 	"log"
 	"time"
 )
 
+type OAuthToken interface {
+	//	grantNewToken(client_id string) (interface)
+}
+
 type OAuthClient struct {
 	ClientId     string
 	ClientSecret string
-	RedirectUri  string
-	Scope        string
+	GrantType    string
+}
+
+type OAuthPassWord struct {
+	UserId    string
+	PassWord  string
+	GrantType string
 }
 
 type OAuthClientResponse struct {
 	AccessToken string
-	ExpiresIn int
-}
-
-type OAuthToken struct {
-	AccessToken  string
-	ExpiresIn   int
-	ClientId     string
-	TokenType    string
-	TokenScope   string
-	RefreshToken string
+	ExpiresIn   int64
 }
 
 const (
 	DEFAULT_TOKEN_TYPE             = "bearer"
-	REDIS_CODE_PREFIX              = "OAUTH_CODE_"
-	REDIS_CODE_TIMEOUT             = 300000
-	TOKEN_VALIDATE_TIME_IN_SECONDS = 60
+	TOKEN_VALIDATE_TIME_IN_SECONDS = 60 * 60 * 2
 )
 
 //const TOKEN_VALIDATE_TIME_IN_SECONDS = 60 * 60 * 24 * 365
 
-func Token(client_id string, client_secret string, grant_type string, redirect_uri string) (OAuthTokenResponse, error) {
+func GetClientToken(client_id string, client_secret string, grant_type string) (OAuthClientResponse, error) {
 
 	if client_id == "" {
 		return OAuthClientResponse{}, nil
@@ -49,26 +48,31 @@ func Token(client_id string, client_secret string, grant_type string, redirect_u
 		return OAuthClientResponse{}, nil
 	}
 
-	if code == "" {
-		return OAuthClientResponse{}, nil
-	}
-
 	if grant_type == "client_credentials" {
 
-		code, access_token, expires_in := Redis.Get(client_id, REDIS_CODE_PREFIX)
+		//		code, access_token, expires_in := Redis.Get(client_id, REDIS_CODE_PREFIX)
 
-		if access_token == "" {
-			token = new(OAuthToken)
-			oauth_token := token.grantNewToken(client_id, grant_type, redirect_uri)
-			
-			access_token := token.AccessToken
-			expires_in := TokenExpirationInSeconds()
-			
-			Redis.Save(client_id, oauth_token, expires_in)
-			
-			
-			return OAuthClientResponse{AccessToken:,ExpiresIn:TokenExpirationInSeconds()}, nil
-		}
+		//		if access_token == "" {
+		//		token := new(OAuthClientResponse)
+		//		oauth_token := token.grantNewToken(client_id, grant_type)
+
+		//			Redis.Save(client_id, oauth_token, expires_in)
+
+		//		return oauth_token, nil
+		//		}
+
+		response := grantNewToken(client_id)
+
+		client := new(OAuthClient)
+		client.ClientId = client_id
+		client.ClientSecret = client_secret
+		client.GrantType = grant_type
+		var time_out = time.Second * TOKEN_VALIDATE_TIME_IN_SECONDS
+
+		data, _ := json.Marshal(client)
+		RedisSave(response.AccessToken, data, time_out)
+
+		return OAuthClientResponse{AccessToken: response.AccessToken, ExpiresIn: response.ExpiresIn}, nil
 
 	}
 
@@ -76,9 +80,55 @@ func Token(client_id string, client_secret string, grant_type string, redirect_u
 
 }
 
-func (token *OAuthToken) TokenExpirationInSeconds() int {
-	log.Println("token expired date:" + token.Expiration)
-	expTime, err := time.ParseInLocation("2006-01-02 15:04:05", token.Expiration, time.Local)
+func GetPassWordToken(user_id string, pass_word string, grant_type string) (OAuthClientResponse, error) {
+
+	if user_id == "" {
+		return OAuthClientResponse{}, nil
+	}
+
+	if pass_word == "" {
+		return OAuthClientResponse{}, nil
+	}
+
+	if grant_type == "" {
+		return OAuthClientResponse{}, nil
+	}
+
+	if grant_type == "password" {
+
+		//		code, access_token, expires_in := Redis.Get(client_id, REDIS_CODE_PREFIX)
+
+		//		if access_token == "" {
+		//		token := new(OAuthClientResponse)
+		//		oauth_token := token.grantNewToken(client_id, grant_type)
+
+		//			Redis.Save(client_id, oauth_token, expires_in)
+
+		//		return oauth_token, nil
+		//		}
+
+		response := grantNewToken(user_id)
+
+		client := new(OAuthPassWord)
+		client.UserId = user_id
+		client.PassWord = pass_word
+		client.GrantType = grant_type
+
+		var time_out = time.Second * TOKEN_VALIDATE_TIME_IN_SECONDS
+		data, _ := json.Marshal(client)
+		RedisSave(response.AccessToken, data, time_out)
+
+		return OAuthClientResponse{AccessToken: response.AccessToken, ExpiresIn: response.ExpiresIn}, nil
+
+	}
+
+	return OAuthClientResponse{}, nil
+
+}
+
+func TokenExpirationInSeconds() int {
+	//	log.Println("token expired date:" + token.Expiration)
+	expTime, err := time.ParseInLocation("2006-01-02 15:04:05", "2017-05-11 14:06:06", time.Local)
 	if err != nil {
 		log.Println("error while parse time")
 		log.Println(err)
@@ -94,32 +144,25 @@ func (token *OAuthToken) TokenExpirationInSeconds() int {
 	return int(gap)
 }
 
-func (token *OAuthToken)IsTokenExpirated() bool {
-	gap := TokenExpirationInSeconds()
-	if gap == 0 {
-		return true
-	}
-	return false
-}
+func grantNewToken(client_id string) *OAuthClientResponse {
 
-func (token *OAuthToken)grantNewToken(client_id string, token_type string, token_scope string) *OAuthToken {
+	//	log.Println(EXP_TIME)
+	//	t := time.Unix(EXP_TIME, 0)
+	//	date := EXP_TIME.Unix()
+	//	date := t.Format("2006-01-02 15:04:05")
+	//	date := t.Unix()
+	//	log.Println(date)
+	var response = new(OAuthClientResponse)
 
-//	expTime := time.Now().Unix() + TOKEN_VALIDATE_TIME_IN_SECONDS
-//	t := time.Unix(expTime, 0)
-//	date := t.Format("2006-01-02 15:04:05")
-//	var OAuthToken = new(OAuthToken)
+	//	token.ClientId = client_id
+	//	access_token := RandomCreateBytes(64)
+	//	refresh_token := uuid.NewV4().String()
+	//	expires_in := TokenExpirationInSeconds()
 
-	token.ClientId = client_id
-	access_token := uuid.NewV4().String()
-	refresh_token := uuid.NewV4().String()
-	expires_in := token.TokenExpirationInSeconds()
-	
-	token.AccessToken = access_token
-	token.ExpiresIn = expires_in
-	token.TokenScope = token_scope
-	token.TokenType = token_type
-	token.RefreshToken = refresh_token
-	log.Println("grant new token:" + token)
+	response.AccessToken = RandString(64)
+	response.ExpiresIn = TOKEN_VALIDATE_TIME_IN_SECONDS
+	//	token.RefreshToken = refresh_token
+	//	log.Println("grant new token:" + access_token)
 	//	data.SaveToken(OAuthToken)
-	return OAuthToken
+	return response
 }

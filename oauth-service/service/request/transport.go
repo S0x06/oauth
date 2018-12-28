@@ -6,23 +6,27 @@ import (
 	"net/http"
 )
 
-type tokenRequest struct {
+type TokenRequest struct {
 	AppId     string `json:"app_id"`
 	AppSecret string `json:"app_secret"`
-	Scope     string `json:"scope"`
+	//	Scope     string `json:"scope"`
 	GrantType string `json:"grant_type"`
-	r         *http.Request
 }
 
-type tokenResponse struct {
+type TokenResponse struct {
 	AccessToken string `json:"access_token"`
-	ExpiresIn   string `json:"expires_in"`
-	Scope       string `json:"scope"`
-	TokenType   string `json:"token_type"`
+	ExpiresIn   int64  `json:"expires_in"`
+	//	Scope       string `json:"scope"`
+	//	TokenType   string `json:"token_type"`
+}
+
+type ErrResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 func DecodeGetTokenRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var request tokenRequest
+	var request TokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		return nil, err
 	}
@@ -32,4 +36,23 @@ func DecodeGetTokenRequest(_ context.Context, r *http.Request) (interface{}, err
 
 func EncodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
+}
+
+type ModuleRequest struct {
+	Module      string `json:"module"`
+	AccessToken string `json:"access_token"`
+	//	r      *http.Request
+}
+
+type ModuleResponse struct {
+	Result bool `json:"result"`
+}
+
+func DecodeGetModuleRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	var request ModuleRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		return nil, err
+	}
+	//	fmt.Println(request.AppId)
+	return request, nil
 }
