@@ -1,11 +1,11 @@
 package util
 
 import (
-	"fmt"
+	//	"fmt"
 	//	"encoding/base32"
 	"encoding/base64"
 	//	"encoding/hex"
-	"log"
+	//	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -20,51 +20,56 @@ type jwtClaims struct {
 	jwt.StandardClaims
 
 	// 追加自己需要的信息
-	Data interface{}
+	//	Data interface{}
+	AppId     string
+	AppSecret string
+	//	GrantType string
 
-	TimeOut int
+	TimeOut int64
 	//	Key       string
 	//	Secret    string
 	//	GrantType string
 }
 
-func GenerateJwtToken(Issuer string, Data interface{}) (base64Token string, err error) {
+func GenerateJwtToken(Issuer string, AppId string, AppSecret string) (base64Token string, expiresIn int, err error) {
+
+	var TimeOut int64 = int64(time.Now().Add(time.Hour * TOKEN_TIME_OUT).Unix())
+	//	var TokenTime int64 = int64(time.Now().Add(time.Seconds * TOKEN_TIME_OUT).Unix())
 
 	claims := &jwtClaims{
 		jwt.StandardClaims{
-			ExpiresAt: int64(time.Now().Add(time.Hour * TOKEN_TIME_OUT).Unix()),
+			ExpiresAt: TimeOut,
 			Issuer:    Issuer,
 		},
 
-		Data,
+		AppId,
+		AppSecret,
 
-		TOKEN_TIME_OUT,
+		TimeOut,
 	}
 
 	var token string
 	JwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err = JwtToken.SignedString([]byte(SecretKey))
 
+	expiresIn = TOKEN_TIME_OUT * 60 * 60
 	if err != nil {
-		return "", err
+		return "", expiresIn, err
 	}
 
 	//	var hexToken string
 	//	hexToken = hex.EncodeToString([]byte(token))
 	base64Token = base64.StdEncoding.EncodeToString([]byte(token))
-	fmt.Println("+++")
-	fmt.Println(base64Token)
-	fmt.Println("+++")
-	return base64Token, nil
 
+	return base64Token, expiresIn, nil
 }
 
-func ParseToken(Base64Token string) (claims jwt.Claims, err error) {
+func ParseToken(Base64Token string) ( /*claims jwt.Claims*/ claims interface{}, err error) {
 
 	BytesToken, err := base64.StdEncoding.DecodeString(Base64Token)
 	//	BytesToken, err := hex.DecodeString(Base64Token)
 	if err != nil {
-		log.Fatalln(err)
+		return "", err
 	}
 
 	Token := string(BytesToken)

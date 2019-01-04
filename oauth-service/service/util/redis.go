@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	//	"strings"
+
 	"time"
 
 	"github.com/go-redis/redis"
@@ -42,6 +43,22 @@ func init() {
 	Cli = client
 }
 
+//func New() {
+//	client := redis.NewClient(&redis.Options{
+//		Addr:     Addr + ":" + Port,
+//		Password: "",
+//		DB:       0,
+//	})
+
+//	pong, err := client.Ping().Result()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Println(pong, err)
+
+//	Cli = client
+//}
+
 //var Redis = NewRedisClient(Addr, Password, DB)
 
 //func NewRedisClient(Addr string, Password string, DB int) *RedisClient {
@@ -76,15 +93,21 @@ func RedisRemove(client_id string) {
 	}
 }
 
-func RedisGet(client_id string) (string, string, error) {
+func RedisGet(client_id string) (string, interface{}, error) {
 	key := REDIS_CODE_PREFIX + client_id
+
+	fmt.Println(key)
 	value, err := Cli.Get(key).Result()
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	//	value := "dd"
 	if value == "" {
 		return "", "", nil
 	}
+
+	fmt.Println(value)
 
 	//	var data interface{}
 	//	err = json.Unmarshal([]byte(value), data)

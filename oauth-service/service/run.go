@@ -24,6 +24,14 @@ func Run() {
 		request.EncodeResponse,
 	)
 
+	password := request.PassWordTokenService{}
+
+	PassWordHandler := httptransport.NewServer(
+		request.MakeGetPassWordTokenEndpoint(password),
+		request.DecodeGetPassWordTokenRequest,
+		request.EncodeResponse,
+	)
+
 	module := request.OauthModuleService{}
 
 	ModuleHandler := httptransport.NewServer(
@@ -32,7 +40,21 @@ func Run() {
 		request.EncodeResponse,
 	)
 
+	authorize := request.AuthorizationTokenService{}
+
+	AuthorizeHandler := httptransport.NewServer(
+		request.MakeGetAuthorizationTokenEndpoint(authorize),
+		request.DecodeGetAuthorizationTokenRequest,
+		request.EncodeResponse,
+	)
+
+	http.HandleFunc("/authorize", request.AuthorizeHandler)
+	http.HandleFunc("/login", request.LoginHandler)
+	http.HandleFunc("/auth", request.AuthHandler)
+
+	http.Handle("/access_token", AuthorizeHandler)
 	http.Handle("/token", TokenHandler)
+	http.Handle("/password", PassWordHandler)
 	http.Handle("/module", ModuleHandler)
 
 	//	errChan := make(chan error)
@@ -46,6 +68,5 @@ func Run() {
 
 	logger.Log("msg", "HTTP", "addr", ":8080")
 	logger.Log("err", http.ListenAndServe(":8080", nil))
-	//	ilog.Fatalln(error)
 
 }
